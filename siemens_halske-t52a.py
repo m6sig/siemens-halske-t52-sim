@@ -82,6 +82,23 @@ tty_figs2asc = [
        '3', '+',    '$',  '?', "'", '6', '&', '/',
        '-', '2', '\x07', FIGS, '7', '1', '(', LTRS]
 
+tty2bpname = [
+    '/', 'T', '3', 'O', '9', 'H', 'N', 'M',
+    '4', 'L', 'R', 'G', 'I', 'P', 'C', 'V',
+    'E', 'Z', 'D', 'B', 'S', 'Y', 'F', 'X',
+    'A', 'W', 'J', '5', 'U', 'Q', 'K', '8']
+
+def tty2blyprintout(s):
+    
+    result = []
+    for char in s:
+        char = ord(char) & MSK5
+        char = tty2bpname[char]
+        result.append(char)
+
+    return ''.join(result)
+
+
 def ascii2tty(s):
     '''Convert from ASCII to 5-bits TTY code.
 
@@ -331,6 +348,10 @@ if __name__ == '__main__':
                         metavar='<input file>',
                         help='''Read input file in Baudot code and display ASCII equivalent.''')
 
+    parser.add_argument('--printout', action=gather_args, nargs=2,
+                        metavar=('<input file>', '<output file>'),
+                        help='''Read input file in Baudot code and output the Bletchley Park teleprinter format equivalent to the screen and output file.''')
+
 
     # Parse the command-line arguments. Need to create empty arg_sequence
     # in case no command-line arguments were included.
@@ -439,6 +460,20 @@ if __name__ == '__main__':
         with open(tty_file, 'r') as f_in:
             tty_stream = f_in.read()
         print(tty2ascii(tty_stream))
+
+    elif cmd == 'printout':
+        baudot_file = Path(opt[0])
+        output_file = opt[1]
+        validate_args(baudot_file)
+        print("Reading TTY tape file...")
+        with open(baudot_file, 'r') as f_in:
+            bcode = f_in.read()
+        bp_print_out = tty2blyprintout(bcode)
+
+        with open(output_file, 'w') as f_out:
+            f_out.write(bp_print_out)
+        print("Tape in bletchley park format written to:", output_file)
+        print("The tape read:", bp_print_out)
 
 
     else:
