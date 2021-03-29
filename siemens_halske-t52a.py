@@ -34,8 +34,8 @@ FIGS_F = 128    # figures required flag
 ETHR_F = 64     # valid in either shift
 LTRS   = 31     # letters shift character
 FIGS   = 27     # figures shift character
-MSX5   = 31     # mask off 5 LSBs
-MSX7   = 127    # mask off 7 LSBs
+MSK5   = 31     # mask off 5 LSBs
+MSK7   = 127    # mask off 7 LSBs
 
 # For converting ASCII to 5-bits TTY code.
 #
@@ -110,7 +110,7 @@ def ascii2tty(s):
     result = []
     # Emit initial shift if needed
     if len(s) > 0:
-        char = asc2tty[s[0] & MSX7]
+        char = asc2tty[s[0] & MSK7]
         if (char & ETHR_F):
             # Valid in either shift
             pass
@@ -126,7 +126,7 @@ def ascii2tty(s):
     # Convert chars
     for char in s:
         # Drop MSB and convert
-        char = asc2tty[char & MSX7]
+        char = asc2tty[char & MSK7]
 
         # Convert if valid
         if char != INVC:
@@ -148,7 +148,7 @@ def ascii2tty(s):
                 figs = False
 
             # Emit the converted char
-            result.append(chr(char & MSX5))
+            result.append(chr(char & MSK5))
 
     return ''.join(result)
 
@@ -161,7 +161,7 @@ def tty2ascii(s):
     figs = False
     result = []
     for char in s:
-        char = ord(char) & MSX5
+        char = ord(char) & MSK5
         if char == LTRS:
             figs = False
         elif char == FIGS:
